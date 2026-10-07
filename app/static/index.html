@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数控铣削快移碰料检查</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>数控铣削快移碰料检查台</h1>
+  <p class="sub">上传 G-code, 回放加工过程, 检查 G0 快移是否碰到当前余料</p>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>1. 加工参数</h2>
+    <div class="params">
+      <label>毛坯宽度 X (mm)<input id="stockWidth" type="number" value="100" min="0.001" step="any"></label>
+      <label>毛坯长度 Y (mm)<input id="stockLength" type="number" value="80" min="0.001" step="any"></label>
+      <label>毛坯厚度 (mm)<input id="stockThickness" type="number" value="20" min="0.001" step="any"></label>
+      <label>平底刀直径 (mm)<input id="toolDiameter" type="number" value="6" min="0.001" step="any"></label>
+      <label>安全高度 (mm)<input id="safeHeight" type="number" value="5" min="0.001" step="any"></label>
+    </div>
+    <p class="hint">毛坯顶面 Z=0, 左下角 (0,0); 起点 (0, 0, 安全高度); 默认 G17/G21/G90。</p>
+  </section>
+
+  <section class="panel">
+    <h2>2. G-code</h2>
+    <div class="gcode-bar">
+      <input id="fileInput" type="file" accept=".nc,.gcode,.tap,.txt">
+      <select id="exampleSelect">
+        <option value="">载入示例…</option>
+        <option value="safe">示例: 安全(型腔+快移利用空腔)</option>
+        <option value="collision">示例: 碰料(快移穿入余料)</option>
+        <option value="ramp">示例: 斜坡槽(快移在浅端碰料)</option>
+        <option value="helical">示例: 螺旋槽(整圆+Z 下切)</option>
+        <option value="error">示例: 错误(非法圆弧)</option>
+      </select>
+      <button id="checkBtn">开始检查</button>
+    </div>
+    <textarea id="gcode" rows="14" spellcheck="false"
+      placeholder="在此粘贴 G-code, 或选择文件 / 载入示例"></textarea>
+  </section>
+
+  <section class="panel" id="resultPanel" hidden>
+    <h2>3. 检查结果</h2>
+    <div id="statusBanner"></div>
+    <div id="resultDetail"></div>
+    <div class="canvas-wrap">
+      <canvas id="mapCanvas"></canvas>
+      <div class="legend">
+        <div class="legend-title">余料顶面深度 (mm)</div>
+        <canvas id="legendCanvas" width="24" height="180"></canvas>
+        <div class="legend-labels"><span id="legendTop">0</span><span id="legendBottom">-T</span></div>
+        <div class="legend-item"><span class="sw" style="background:#f2f2f2"></span>未切削</div>
+        <div class="legend-item"><span class="sw" style="background:#1565c0"></span>切削轨迹</div>
+        <div class="legend-item"><span class="sw" style="background:#ef6c00"></span>快移轨迹</div>
+        <div class="legend-item"><span class="sw" style="background:#d50000"></span>碰料点</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
